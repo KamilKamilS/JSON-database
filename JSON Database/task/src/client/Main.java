@@ -1,6 +1,7 @@
 package client;
 
 import com.beust.jcommander.JCommander;
+import com.google.gson.Gson;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,6 +17,7 @@ public class Main {
         String answer;
 
         Message msg = new Message();
+        Gson gson = new Gson();
 
         JCommander.newBuilder()
                 .addObject(msg)
@@ -29,7 +31,7 @@ public class Main {
         {
             System.out.println("Client started!");
 
-            String query = String.format("%s %s %s", msg.getType(), msg.getIndex(), msg.getContent());
+            String query = gson.toJson(msg);
             output.writeUTF(query);
             System.out.println("Sent: " + query);
 

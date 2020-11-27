@@ -1,6 +1,7 @@
 package server;
 
 import client.Message;
+import com.google.gson.Gson;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,17 +9,19 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
-    static String[] database = new String[1000];
+    static Map<String, String> database = new HashMap<>();
+    static Gson gson = new Gson();
 
     public static void main(String[] args) {
         String address = "127.0.0.1";
         int port = 23456;
         String query;
 
-        Arrays.fill(database, "");
+
 
         try (
                 ServerSocket server = new ServerSocket(port, 50, InetAddress.getByName(address))
@@ -31,12 +34,16 @@ public class Main {
                         DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
                     query = input.readUTF();
 
-                    String result = process(query);
-                    if (result.equals("EXIT")) {
+                    Message msg = gson.fromJson(query, Message.class);
+
+                    Message messageFromServer = process(msg);
+                    output.writeUTF(gson.toJson(messageFromServer));
+
+                    if (msg.getType().equals("exit")) {
                         output.writeUTF("OK");
                         System.exit(0);
                     }
-                    output.writeUTF(result);
+
                 }
             }
         } catch (IOException e) {
@@ -44,40 +51,53 @@ public class Main {
         }
     }
 
-    private static String process(String msg) {
+    private static Message process(Message msg) {
         String type;
         int index;
         String content;
 
-        String[] msgArray = msg.split("\\s+");
-        type = msgArray[0];
+        type = msg.getType();
         if (type.equals("exit")) {
-            return "EXIT";
+            return new Message.Builder()
+                    .reason("OK")
+                    .build();
         }
 
-        try {
-            index = Integer.parseInt(msgArray[1]);
-        } catch (Exception e) {
-            return "ERROR";
-        }
 
-        if (index < 1 || index > database.length) {
-            return "ERROR";
-        } else {
-            index = index - 1;
-        }
 
         switch (type) {
             case "get":
-                return database[index].equals("") ? "ERROR" : database[index];
+                if (database.containsKey(msg.getKey())) {
+                    return new Message.Builder()
+                            .response("OK")
+                            .value(database.get(msg.getKey()))
+                            .build();
+                } else {
+                    return new Message.Builder()
+                            .response("ERROR")
+                            .reason("No such key")
+                            .build();
+                }
             case "set":
-                database[index] = String.join(" ", Arrays.copyOfRange(msgArray, 2, msgArray.length));
-                return "OK";
+                database.put(msg.getKey(), msg.getValue());
+                return new Message.Builder()
+                        .response("OK")
+                        .build();
             case "delete":
-                database[index] = "";
-                return "OK";
+                if (database.containsKey(msg.getKey())) {
+                    database.remove(msg.getKey());
+                    return new Message.Builder()
+                            .response("OK")
+                            .build();
+                }
+                return new Message.Builder()
+                        .response("ERROR")
+                        .reason("No such key")
+                        .build();
             default:
-                return "ERROR";
+                return new Message.Builder()
+                        .response("ERROR")
+                        .build();
         }
     }
 }
