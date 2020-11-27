@@ -20,7 +20,6 @@ public class Main {
 
         Arrays.fill(database, "");
 
-
         try (
                 ServerSocket server = new ServerSocket(port, 50, InetAddress.getByName(address))
         ) {
@@ -61,7 +60,6 @@ public class Main {
         } catch (Exception e) {
             return "ERROR";
         }
-
 
         if (index < 1 || index > database.length) {
             return "ERROR";
