@@ -10,6 +10,8 @@ public class Message {
     private String key;
     @Parameter(names = "-v")
     private String value;
+    @Parameter(names = "-in")
+    private String inputFile;
     private String response;
     private String reason;
 
@@ -36,18 +38,22 @@ public class Message {
             this.type = type;
             return this;
         }
+
         public Builder key(String key) {
             this.key = key;
             return this;
         }
+
         public Builder value(String value) {
             this.value = value;
             return this;
         }
+
         public Builder response(String response) {
             this.response = response;
             return this;
         }
+
         public Builder reason(String reason) {
             this.reason = reason;
             return this;
@@ -62,18 +68,23 @@ public class Message {
         return type;
     }
 
-    public String  getKey() {
+    public String getKey() {
         return key;
     }
 
     public String getValue() {
         return value;
     }
+
     public String getResponse() {
         return response;
     }
+
     public String getReason() {
         return reason;
     }
 
+    public String getInputFile() {
+        return inputFile;
+    }
 }

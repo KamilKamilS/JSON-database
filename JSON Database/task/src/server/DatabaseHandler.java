@@ -1,6 +1,4 @@
-package server.data;
-
-import server.Database;
+package server;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,17 +21,29 @@ public class DatabaseHandler {
     }
 
     public String getData(String key) {
-
         String result = null;
+        readLock.lock();
         currentData = database.getData();
 
-        result = currentData.get(key);
+        result = currentData.getOrDefault(key, null);
+        readLock.unlock();
         return result;
     }
 
     public void setData(String key, String value) {
+        writeLock.lock();
         currentData = database.getData();
         currentData.put(key, value);
-        database.updateDataBase(currentData);
+        database.updateDatabase(currentData);
+        writeLock.unlock();
     }
+
+    public void deleteData(String key) {
+        writeLock.lock();
+        currentData = database.getData();
+        currentData.remove(key);
+        database.updateDatabase(currentData);
+        writeLock.unlock();
+    }
+
 }

@@ -15,6 +15,7 @@ public class Main {
         String address = "127.0.0.1";
         int port = 23456;
         String answer;
+        String query;
 
         Message msg = new Message();
         Gson gson = new Gson();
@@ -31,12 +32,18 @@ public class Main {
         {
             System.out.println("Client started!");
 
-            String query = gson.toJson(msg);
-            output.writeUTF(query);
-            System.out.println("Sent: " + query);
+            if (msg.getInputFile() != null) {
+                Message message = FileManager.messageFromFile(msg.getInputFile());
+                query = gson.toJson(message);
+            } else {
+                query = gson.toJson(msg);
+            }
+                output.writeUTF(query);
+                System.out.println("Sent: " + query);
 
-            answer = input.readUTF();
-            System.out.println("Received: " + answer);
+                answer = input.readUTF();
+                System.out.println("Received: " + answer);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
