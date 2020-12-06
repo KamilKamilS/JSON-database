@@ -32,7 +32,6 @@ public class ClientThread implements Runnable {
             String query = input.readUTF();
             Message msg = new Gson().fromJson(query, Message.class);
 
-
             if (msg.getType().equals("exit")) {
                 output.writeUTF(new Gson().toJson(new Message.Builder().response("OK").build()));
                     serverSocket.close();
@@ -49,17 +48,8 @@ public class ClientThread implements Runnable {
 
 
     private Message process(Message msg) {
-
         String type;
-        int index;
-        String content;
-
         type = msg.getType();
-//        if (type.equals("exit")) {
-//            return new Message.Builder()
-//                    .response("OK")
-//                    .build();
-//        }
 
         switch (type) {
             case "get":

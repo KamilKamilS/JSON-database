@@ -1,22 +1,14 @@
 package server;
 
-
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Main {
-    //    static Map<String, String> database = new HashMap<>();
-    static Gson gson = new Gson();
-    static ExecutorService executorService = Executors.newFixedThreadPool(4);
     static Database database = new Database("/Users/kamil/Code/Hyperskill/JSON Database/JSON Database/task/src/server/data/db.json");
     static DatabaseHandler handler = new DatabaseHandler(database);
-    static boolean run = true;
 
     public static void main(String[] args) {
         String address = "127.0.0.1";
